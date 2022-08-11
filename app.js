@@ -20,7 +20,7 @@ const winningMessageTextElement = document.querySelector(
 );
 // Declare variable turn, if its true, its O turn, if its false, its X turn
 let circleTurn;
-
+let computerTurn;
 // Add sound effects
 let audioPlaceMark = new Audio(
   "./audio/mixkit-page-forward-single-chime-1107.wav"
@@ -45,12 +45,19 @@ function startGame() {
   setBoardHoverClass();
   winningMessageElement.classList.remove("show");
 }
+
 // Create a function handleClick
 function handleClick(e) {
-  const cell = e.target;
   const currentClass = circleTurn ? CIRCLE_CLASS : X_CLASS;
+  // console.log(cellElements[0].className, "cell");
+
+  // console.log(unmarkedCells, "unmarkedCells");
+
+  if (!circleTurn) {
+    const cell = e.target;
+    placeMark(cell, currentClass);
+  }
   //placeMark
-  placeMark(cell, currentClass);
   audioPlaceMark.play();
   //Check for Win
   if (checkWin(currentClass)) {
@@ -87,8 +94,33 @@ function placeMark(cell, currentClass) {
   cell.classList.add(currentClass);
 }
 function swapTurns() {
-  // Set circleTurn to the opposite so that it will be swapping every single time
   circleTurn = !circleTurn;
+  const currentClass = circleTurn ? CIRCLE_CLASS : X_CLASS;
+  const unmarkedCells = [];
+  cellElements.forEach((cell) => {
+    if (cell.className === "cell") unmarkedCells.push(cell);
+  });
+  console.log(unmarkedCells, "unmarkedCells");
+  if (circleTurn) {
+    let index = Math.floor(Math.random() * unmarkedCells.length);
+    console.log(unmarkedCells, index, "unmarkedCells");
+    console.log(unmarkedCells[index]);
+    placeMark(unmarkedCells[index], currentClass);
+    if (checkWin(currentClass)) {
+      endGame(false);
+      winningAudio.play();
+      //Check for Draw
+    } else if (isDraw()) {
+      endGame(true);
+      drawAudio.play();
+    } else {
+      //Switch tunrs
+      // swapTurns();
+      circleTurn = !circleTurn;
+      setBoardHoverClass();
+    }
+    // Set circleTurn to the opposite so that it will be swapping every single time
+  }
 }
 function setBoardHoverClass() {
   board.classList.remove(X_CLASS);
